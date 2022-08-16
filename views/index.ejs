@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <% const estilo='color:blue' %>
+    <h1 style=<%= estilo  %>>Plantilla con ejs</h1>
+    <% console.log('Hola Julian') %>
+    <h2><em><%= mensaje %></em></h2>
+
+    <%- include('partials/formulario.ejs') %>
+    
+    <% if(productos.length > 0) { %>
+        <ul>
+            <% productos.forEach( prod => { %>
+                <li>Nombre: <%= prod.nombre %> - <%= prod.precio %></li>
+            <% }) %> 
+
+        </ul>
+    <% }else{ %>
+        <h2>No hay productos</h2>
+    <% } %>    
+    <%- include('partials/footer.ejs', {mensajeFooter: 'Soy el mensaje para el footer'}) %>
+</body>
+</html>
