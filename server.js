@@ -1,4 +1,6 @@
 const express = require ('express')
+const handlebars = require('express-handlebars')
+const {Contenedor} = require("./contenedor")
 const app = express()
 
 app.use(express.urlencoded({extended:true}))
@@ -6,39 +8,52 @@ app.use(express.urlencoded({extended:true}))
 // configuro el puerto 
 const port = process.env.PORT || 8080
 
+// declaro el contenedor
+
+const contenedor = new Contenedor("./productos.json")
+
 //configuro el views
 
-app.set('view engine' , 'ejs')
+app.set('view engine' , 'hbs')
 app.set('views', './views')
 
-//configuro el get
-app.get ('/' , (req, res) => {
-    let productos = [
-        {nombre:'Producto 1', precio: '$100'},
-        {nombre:'Producto 2', precio: '$200'},
-        {nombre:'Producto 3', precio: '$300'},
-        {nombre:'Producto 4', precio: '$3400'},
-        {nombre:'Producto 5', precio: '$7890'}
-    ]
+app.use(express.static('public'))
+ 
+app.engine(
+    'hbs',
+    handlebars.engine({
+        extname:".hbs",
+        defaultLayout:"",
+        layoutsDir: "",
+        partialsDir: __dirname + "/views/partials"
+    })
+)
+
+app.get("/", async (req, res) => {
+    const producto = await contenedor.getAll();
     res.render('index', {
-        mensaje: 'Hola EJS',
-        productos: productos
+        list: producto,
+        listExist: true,
+        producto: true
     })
-})
+});
 
-app.post('/productos', (req, res) =>{
-    const obj = req.body
-    console.log(obj) 
-    const {nombre, descripcion, price} = req.body
-
-    productos.push({
-        nombre,
-        price,
-        descripcion
+app.get('/productos', async (req , res) => {
+    const producto = await contenedor.getAll();
+    res.render('productos', {
+        titulo: 'Mis productos de handlebars',
+        list: producto,
+        listExist: true,
+        producto: true
     })
-    res.render('index')
-})
-  
+});
+
+app.post('/productos', async (req, res) =>{
+    const objProducto = req.body;
+    contenedor.save(objProducto);
+    const listExist = true;
+    res.redirect('/productos');
+});
 
 
 
